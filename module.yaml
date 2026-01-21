@@ -1,0 +1,52 @@
+name: multi-tenancy
+version: 1.0.0
+description: "Multi-tenancy foundation module - データ分離とテナント管理"
+namespace: Calema\MultiTenancy
+author: Calema Team
+license: proprietary
+layer: core
+
+composer_package: calema/multi-tenancy
+
+dependencies:
+  yourcompany/calema-sso: ^1.0
+
+provides:
+  - tenant-isolation
+  - tenant-scoping
+  - tenant-identification
+  - tenant-management
+
+migrations:
+  - database/migrations
+
+seeders:
+  - database/seeders/TenantSeeder
+
+config:
+  - config/multi-tenancy.php
+
+routes: {}
+
+permissions:
+  - tenant.create
+  - tenant.view
+  - tenant.update
+  - tenant.delete
+  - tenant.switch
+
+events:
+  - Calema\MultiTenancy\Events\TenantCreated
+  - Calema\MultiTenancy\Events\TenantSwitched
+
+installation:
+  steps:
+    - composer require calema/multi-tenancy
+    - php artisan vendor:publish --tag=multi-tenancy-config
+    - php artisan vendor:publish --tag=multi-tenancy-migrations
+    - php artisan migrate
+    - php artisan db:seed --class=Calema\\MultiTenancy\\Database\\Seeders\\TenantSeeder
+
+env_variables:
+  TENANCY_IDENTIFICATION_METHOD: "subdomain"
+  APP_DOMAIN: "calema.jp"
