@@ -33,6 +33,12 @@ class MultiTenancyServiceProvider extends ServiceProvider
         // Migrations
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
+        // Routes
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+
+        // Views
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'multi-tenancy');
+
         // Publishable resources
         if ($this->app->runningInConsole()) {
             // Config
@@ -44,6 +50,11 @@ class MultiTenancyServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../database/migrations' => database_path('migrations'),
             ], 'multi-tenancy-migrations');
+
+            // Views
+            $this->publishes([
+                __DIR__.'/../resources/views' => resource_path('views/vendor/multi-tenancy'),
+            ], 'multi-tenancy-views');
         }
 
         // Middleware
