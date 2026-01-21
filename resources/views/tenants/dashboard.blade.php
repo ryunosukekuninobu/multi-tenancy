@@ -71,8 +71,50 @@
                     </div>
                 @endif
 
-                <!-- Dashboard Content -->
+                <!-- Quick Actions -->
                 <div class="px-4 py-6 sm:px-0">
+                    <div class="mb-6 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-lg shadow-lg overflow-hidden">
+                        <div class="px-6 py-8">
+                            <h2 class="text-2xl font-bold text-white mb-4">クイックアクション</h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <a href="{{ route('tenants.show', $tenant) }}" class="bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg p-4 text-white">
+                                    <div class="flex items-center">
+                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        <span class="ml-3 font-medium">教室詳細</span>
+                                    </div>
+                                </a>
+                                <a href="{{ route('tenants.edit', $tenant) }}" class="bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg p-4 text-white">
+                                    <div class="flex items-center">
+                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <span class="ml-3 font-medium">設定変更</span>
+                                    </div>
+                                </a>
+                                <a href="#" class="bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg p-4 text-white">
+                                    <div class="flex items-center">
+                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                        </svg>
+                                        <span class="ml-3 font-medium">ユーザー管理</span>
+                                    </div>
+                                </a>
+                                <a href="#" class="bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg p-4 text-white">
+                                    <div class="flex items-center">
+                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span class="ml-3 font-medium">予約管理</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         <!-- Tenant Info Card -->
                         <div class="bg-white overflow-hidden shadow rounded-lg">
@@ -96,8 +138,11 @@
                                 </div>
                             </div>
                             <div class="bg-gray-50 px-5 py-3">
-                                <div class="text-sm">
-                                    <a href="{{ route('tenants.edit', $tenant) }}" class="font-medium text-blue-600 hover:text-blue-900">
+                                <div class="text-sm flex gap-4">
+                                    <a href="{{ route('tenants.show', $tenant) }}" class="font-medium text-blue-600 hover:text-blue-900">
+                                        詳細を見る
+                                    </a>
+                                    <a href="{{ route('tenants.edit', $tenant) }}" class="font-medium text-indigo-600 hover:text-indigo-900">
                                         設定を編集
                                     </a>
                                 </div>

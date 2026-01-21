@@ -15,12 +15,16 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <nav class="text-sm mb-2">
+                            <a href="{{ route('dashboard') }}" class="text-blue-600 hover:text-blue-800">
+                                ダッシュボード
+                            </a>
                             @if(Auth::user()->hasRole('system_admin'))
+                                <span class="text-gray-400 mx-2">/</span>
                                 <a href="{{ route('tenants.index') }}" class="text-blue-600 hover:text-blue-800">
                                     全テナント管理
                                 </a>
-                                <span class="text-gray-400 mx-2">/</span>
                             @endif
+                            <span class="text-gray-400 mx-2">/</span>
                             <span class="text-gray-500">テナント詳細</span>
                         </nav>
                         <h1 class="text-3xl font-bold text-gray-900">
