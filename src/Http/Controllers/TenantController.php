@@ -145,6 +145,13 @@ class TenantController extends Controller
      */
     public function edit(Tenant $tenant)
     {
+        $user = Auth::user();
+
+        // 生徒はテナント設定にアクセス不可
+        if ($user->hasRole('student')) {
+            abort(403, '生徒ユーザはテナント設定にアクセスできません。');
+        }
+
         // 自分のテナント、または管理者のみ編集可能
         if (!$this->canAccessTenant($tenant)) {
             abort(403, 'Unauthorized access.');
@@ -158,6 +165,13 @@ class TenantController extends Controller
      */
     public function update(Request $request, Tenant $tenant)
     {
+        $user = Auth::user();
+
+        // 生徒はテナント設定にアクセス不可
+        if ($user->hasRole('student')) {
+            abort(403, '生徒ユーザはテナント設定にアクセスできません。');
+        }
+
         // 自分のテナント、または管理者のみ更新可能
         if (!$this->canAccessTenant($tenant)) {
             abort(403, 'Unauthorized access.');
