@@ -223,9 +223,49 @@ class TenantController extends Controller
                 ->with('info', 'テナントを作成してください。');
         }
 
-        return view('multi-tenancy::tenants.dashboard', [
+        $data = [
             'tenant' => $currentTenant,
-        ]);
+            'unreadNotesCount' => 0,
+            'unreadAnnouncementsCount' => 0,
+        ];
+
+        // Fetch unread notes count if NoteApiClient is available
+        if (class_exists(\Calema\NoteIntegration\Services\NoteApiClient::class)) {
+            try {
+                $noteClient = app(\Calema\NoteIntegration\Services\NoteApiClient::class);
+                $user = Auth::user();
+
+                // If user is teacher or admin, get teacher unread count (notes without teacher comments)
+                // Otherwise, get student unread count (unread teacher comments)
+                if ($user->hasRole('teacher') || $user->hasRole('company_admin') || $user->hasRole('system_admin')) {
+                    $data['unreadNotesCount'] = $noteClient->getTeacherUnreadCount([
+                        'teacher_id' => $user->id,
+                        'teacher_email' => $user->email,
+                        'tenant_id' => $currentTenant->id,
+                    ]);
+                } else {
+                    $data['unreadNotesCount'] = $noteClient->getUnreadCount([
+                        'user_id' => $user->id,
+                        'user_email' => $user->email,
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Failed to fetch unread notes count: ' . $e->getMessage());
+            }
+        }
+
+        // Fetch unread announcements count if AnnouncementService is available
+        if (class_exists(\Calema\AnnouncementSystem\Services\AnnouncementService::class)) {
+            try {
+                $announcementService = app(\Calema\AnnouncementSystem\Services\AnnouncementService::class);
+                $user = Auth::user();
+                $data['unreadAnnouncementsCount'] = $announcementService->getUnreadCount($user->id, $currentTenant->id);
+            } catch (\Exception $e) {
+                \Log::warning('Failed to fetch unread announcements count: ' . $e->getMessage());
+            }
+        }
+
+        return view('multi-tenancy::tenants.dashboard', $data);
     }
 
     /**

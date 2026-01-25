@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>テナントダッシュボード - {{ config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen">
@@ -27,12 +28,45 @@
                                 全テナント管理
                             </a>
                         @endif
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
-                            @csrf
-                            <button type="submit" class="text-sm text-gray-600 hover:text-gray-800">
-                                ログアウト
+
+                        <!-- User Dropdown -->
+                        <div x-data="{ open: false }" class="relative">
+                            <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none">
+                                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                </div>
+                                <span>{{ Auth::user()->name }}</span>
+                                <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
                             </button>
-                        </form>
+
+                            <div x-show="open"
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+                                 style="display: none;">
+                                <div class="px-4 py-3 border-b border-gray-200">
+                                    <p class="text-sm font-semibold text-gray-900">{{ Auth::user()->name }}</p>
+                                    <p class="text-xs text-gray-500 mt-1 break-all">{{ Auth::user()->email }}</p>
+                                    @if(Auth::user()->getRoleNames()->isNotEmpty())
+                                        <p class="text-xs text-blue-600 mt-1">
+                                            🏷️ {{ Auth::user()->getRoleNames()->first() }}
+                                        </p>
+                                    @endif
+                                </div>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                        🚪 ログアウト
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -77,6 +111,21 @@
                         <div class="px-6 py-8">
                             <h2 class="text-2xl font-bold text-white mb-4">クイックアクション</h2>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                @if(Route::has('class.notes.index'))
+                                <a href="{{ route('class.notes.index') }}" class="bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg p-4 text-white relative">
+                                    <div class="flex items-center">
+                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <span class="ml-3 font-medium">ノート管理</span>
+                                        @if(isset($unreadNotesCount) && $unreadNotesCount > 0)
+                                            <span class="ml-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 rounded-full animate-pulse">
+                                                {{ $unreadNotesCount }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </a>
+                                @endif
                                 <a href="{{ route('tenants.show', $tenant) }}" class="bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg p-4 text-white">
                                     <div class="flex items-center">
                                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,19 +152,53 @@
                                         <span class="ml-3 font-medium">ユーザー管理</span>
                                     </div>
                                 </a>
-                                <a href="#" class="bg-white bg-opacity-20 hover:bg-opacity-30 transition-all rounded-lg p-4 text-white">
-                                    <div class="flex items-center">
-                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <span class="ml-3 font-medium">予約管理</span>
-                                    </div>
-                                </a>
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                        <!-- Unread Notes Card -->
+                        @if(isset($unreadNotesCount))
+                        <div class="bg-white overflow-hidden shadow rounded-lg border-2 {{ $unreadNotesCount > 0 ? 'border-red-400' : 'border-gray-200' }}">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-6 w-6 {{ $unreadNotesCount > 0 ? 'text-red-400 animate-pulse' : 'text-gray-400' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">
+                                                先生からの未読コメント
+                                            </dt>
+                                            <dd class="text-lg font-medium {{ $unreadNotesCount > 0 ? 'text-red-600' : 'text-gray-900' }}">
+                                                @if($unreadNotesCount > 0)
+                                                    <span class="inline-flex items-center">
+                                                        🔴 {{ $unreadNotesCount }} 件
+                                                    </span>
+                                                @else
+                                                    なし
+                                                @endif
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-5 py-3">
+                                <div class="text-sm">
+                                    <a href="{{ route('class.notes.index') }}" class="font-medium {{ $unreadNotesCount > 0 ? 'text-red-600 hover:text-red-900' : 'text-blue-600 hover:text-blue-900' }}">
+                                        @if($unreadNotesCount > 0)
+                                            📝 未読を確認する
+                                        @else
+                                            📝 ノート一覧を見る
+                                        @endif
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
                         <!-- Tenant Info Card -->
                         <div class="bg-white overflow-hidden shadow rounded-lg">
                             <div class="p-5">
