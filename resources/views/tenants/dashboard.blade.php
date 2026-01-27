@@ -14,13 +14,51 @@
         <header class="bg-white shadow">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center">
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-900">
-                            {{ $tenant->name }}
-                        </h1>
-                        <p class="mt-1 text-sm text-gray-500">
-                            ドメイン: <code class="bg-gray-100 px-2 py-1 rounded">{{ $tenant->domain }}</code>
-                        </p>
+                    <div class="flex items-center space-x-4">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900">
+                                {{ $tenant->name }}
+                            </h1>
+                            <p class="mt-1 text-sm text-gray-500">
+                                ドメイン: <code class="bg-gray-100 px-2 py-1 rounded">{{ $tenant->domain }}</code>
+                            </p>
+                        </div>
+
+                        @php
+                            $userTenants = Auth::user()->tenants;
+                            $hasMultipleTenants = $userTenants->count() > 1;
+                        @endphp
+
+                        @if($hasMultipleTenants)
+                            <!-- Tenant Switcher Dropdown -->
+                            <div class="relative ml-4" x-data="{ open: false }">
+                                <button @click="open = !open" class="flex items-center text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors border border-gray-300 hover:border-purple-400">
+                                    🔄 教室を切り替え
+                                    <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div x-show="open" @click.away="open = false" x-transition class="absolute left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50" style="display: none;">
+                                    <div class="px-4 py-2 border-b border-gray-200">
+                                        <p class="text-xs font-semibold text-gray-500 uppercase">教室を切り替え</p>
+                                    </div>
+                                    @foreach($userTenants as $tenant)
+                                        <form method="POST" action="{{ route('tenant.switch') }}" class="px-2 py-1">
+                                            @csrf
+                                            <input type="hidden" name="tenant_id" value="{{ $tenant->id }}">
+                                            <button type="submit" class="w-full text-left px-3 py-2 text-sm rounded-md transition-colors {{ $tenant->id === Auth::user()->getCurrentTenantId() ? 'bg-purple-100 text-purple-700 font-semibold' : 'text-gray-700 hover:bg-gray-100' }}">
+                                                <div class="flex items-center justify-between">
+                                                    <span>🏫 {{ $tenant->name }}</span>
+                                                    @if($tenant->id === Auth::user()->getCurrentTenantId())
+                                                        <span class="text-purple-600">✓</span>
+                                                    @endif
+                                                </div>
+                                            </button>
+                                        </form>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
                     <div class="flex items-center space-x-4">
                         @if(Auth::user()->hasRole('system_admin'))
